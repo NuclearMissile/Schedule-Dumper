@@ -13,7 +13,7 @@
 
 'use strict';
 // true for log viewing
-const MYLOG_FLAG = false;
+const MYLOG_FLAG = true;
 const DOM_PARSER = new DOMParser();
 const TIME_TABLE = {
     '1': { start: '092000', end: '105000' },
@@ -29,7 +29,7 @@ console.mylog = msg => {
         console.log('from mylog:');
         console.log(msg);
     }
-}
+};
 
 class Subject {
     constructor(subjectName, url) {
@@ -38,7 +38,7 @@ class Subject {
         this.schduleList = [];
     }
 
-    toString() { return JSON.stringify(this, '   '); }
+    toString() { return JSON.stringify(this, '\t'); }
 
     toEventStringList() {
         return this.schduleList.map(schdule => `BEGIN:VEVENT
@@ -65,7 +65,7 @@ class Schdule {
         this.end = null;
     }
 
-    toString() { return JSON.stringify(this, '   '); }
+    toString() { return JSON.stringify(this, '\t'); }
 }
 
 (function () {
@@ -81,7 +81,7 @@ class Schdule {
     }
 
     fillSubjects(subjectList).then(subjectList => {
-        console.mylog('******Generate iCal file******')
+        console.mylog('******Generate iCal file******');
         subjectList = subjectList.filter(subject => subject.schduleList.length > 0);
         console.mylog(subjectList);
         let eventstring = subjectList.flatMap(subject => subject.toEventStringList(subject)).join('\n');
