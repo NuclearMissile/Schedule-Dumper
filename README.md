@@ -1,5 +1,5 @@
 # Schdule-Dumper
-A tampermonkey script for dumping your course schdule.
+A tampermonkey script dumping your course schdule to .ics file.
 
 # How to use this script:
 
