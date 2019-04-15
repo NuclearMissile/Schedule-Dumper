@@ -112,7 +112,9 @@ function fillSubjects(subjectList) {
                 url: subject.url,
                 onload: resp => {
                     let doc = DOM_PARSER.parseFromString(resp.responseText, "text/html");
-                    for (let tr of $(doc).find("tr:contains('÷v¡x “')~tr")) {
+                    let trs = $(doc).find("tr:contains('÷v¡x “')~tr");
+                    trs = trs.length !== 0 ? trs : $(doc).find("tr:contains('Room')~tr");
+                    for (let tr of trs) {
                         let schdule = new Schdule();
                         schdule.date = formatDate(tr.cells[1].innerHTML.toString().trim());
                         schdule.time = tr.cells[2].innerHTML.toString().trim();
@@ -122,7 +124,7 @@ function fillSubjects(subjectList) {
                         schdule.end = `${schdule.date}T${TIME_TABLE[schdule.time].end}`;
                         schdule.number = tr.cells[0].innerHTML.toString().trim();
                         schdule.room = tr.cells[3].innerHTML.toString().trim();
-                        schdule.note = tr.cells[4].innerHTML.toString().trim();
+                        schdule.note = tr.cells[4].innerHTML.toString().trim() + '(This is a dumped schdule.)';
                         subject.schduleList.push(schdule);
                     }
                     res(subject);
