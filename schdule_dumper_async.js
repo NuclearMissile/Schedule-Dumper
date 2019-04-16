@@ -71,7 +71,7 @@ class Schdule {
     toString() { return JSON.stringify(this, '\t'); }
 }
 
-(function () {
+(async function () {
     if (window.location.href !== TARGET_URL) {
         alert('Please run this script at https://subjregist.naist.jp/registrations/preview_list');
         return;
@@ -88,7 +88,8 @@ class Schdule {
         return;
     }
 
-    fillSubjects(subjectList).then(subjectList => {
+    try {
+        await fillSubjects(subjectList);
         console.mylog('******Generate iCal file******');
         console.mylog(subjectList);
         let icsString = `BEGIN:VCALENDAR
@@ -99,9 +100,9 @@ ${subjectList.flatMap(subject => subject.toEventStringList(subject)).join('\n')}
 END:VCALENDAR`;
         downloadString(icsString, `dump_${moment().format('YYYYMMDDTHHmmss')}.ics`);
         console.mylog('*******END********');
-    }).catch(reason => {
-        alert(reason);
-    });
+    } catch (err) {
+        alert(err);
+    }
 })();
 
 function formatDate(date) {
@@ -109,7 +110,7 @@ function formatDate(date) {
     return `${moment().year()}${date}`;
 }
 
-function fillSubjects(subjectList) {
+async function fillSubjects(subjectList) {
     console.mylog('******fill subjectLists******');
     let promises = $.map(subjectList, subject =>
         new Promise((res, rej) => {
