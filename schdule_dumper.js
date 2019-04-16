@@ -41,7 +41,9 @@ class Subject {
     toString() { return JSON.stringify(this, '\t'); }
 
     toEventStringList() {
-        return this.schduleList.map(schdule => `BEGIN:VEVENT
+        return this.schduleList
+            .filter(schdule => moment().isBefore(schdule.start))
+            .map(schdule => `BEGIN:VEVENT
 DTSTART:${schdule.start}
 DTEND:${schdule.end}
 DESCRIPTION:${schdule.note}
@@ -82,9 +84,10 @@ class Schdule {
 
     fillSubjects(subjectList).then(subjectList => {
         console.mylog('******Generate iCal file******');
-        subjectList = subjectList.filter(subject => subject.schduleList.length > 0);
         console.mylog(subjectList);
-        let eventstring = subjectList.flatMap(subject => subject.toEventStringList(subject)).join('\n');
+        let eventstring = subjectList
+            .flatMap(subject => subject.toEventStringList(subject))
+            .join('\n');
         let icsString = `BEGIN:VCALENDAR
 PRODID:-//Google Inc//Google Calendar 70.9054//EN
 VERSION:2.0
@@ -119,8 +122,6 @@ function fillSubjects(subjectList) {
                         schdule.date = formatDate(tr.cells[1].innerHTML.toString().trim());
                         schdule.time = tr.cells[2].innerHTML.toString().trim();
                         schdule.start = `${schdule.date}T${TIME_TABLE[schdule.time].start}`;
-                        if (moment().isAfter(schdule.start))
-                            continue;
                         schdule.end = `${schdule.date}T${TIME_TABLE[schdule.time].end}`;
                         schdule.number = tr.cells[0].innerHTML.toString().trim();
                         schdule.room = tr.cells[3].innerHTML.toString().trim();
