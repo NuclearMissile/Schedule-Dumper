@@ -1,4 +1,4 @@
-// ==UserScript==
+ï»¿// ==UserScript==
 // @name         Schdule Dumper
 // @version      0.1
 // @description  A tampermonkey script for dumping your course schdule to .ics file.
@@ -115,7 +115,7 @@ function fillSubjects(subjectList) {
                 url: subject.url,
                 onload: resp => {
                     let doc = DOM_PARSER.parseFromString(resp.responseText, "text/html");
-                    let trs = $(doc).find("tr:contains('ÖvÁxÊÒ')~tr");
+                    let trs = $(doc).find("tr:contains('è¬›ç¾©å®¤')~tr");
                     trs = trs.length !== 0 ? trs : $(doc).find("tr:contains('Room')~tr");
                     for (let tr of trs) {
                         let schdule = new Schdule();
