@@ -15,6 +15,7 @@
 // true for log viewing
 const MYLOG_FLAG = true;
 const DOM_PARSER = new DOMParser();
+const TARGET_URL = 'https://subjregist.naist.jp/registrations/preview_list';
 const TIME_TABLE = {
     '1': { start: '092000', end: '105000' },
     '2': { start: '110000', end: '123000' },
@@ -71,6 +72,11 @@ class Schdule {
 }
 
 (function () {
+    if (window.location.href !== TARGET_URL) {
+        alert('Please run this script at https://subjregist.naist.jp/registrations/preview_list');
+        return;
+    }
+
     if (!confirm('Are you sure to dump your registered subjects to .ics file?'))
         return;
 
