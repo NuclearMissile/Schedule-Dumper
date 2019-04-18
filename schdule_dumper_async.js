@@ -73,7 +73,7 @@ class Schdule {
 
 (async function () {
     if (window.location.href !== TARGET_URL) {
-        alert('Please run this script at https://subjregist.naist.jp/registrations/preview_list');
+        alert(`Please run this script at ${TARGET_URL}`);
         return;
     }
 
