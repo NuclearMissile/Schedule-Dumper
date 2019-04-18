@@ -118,8 +118,8 @@ function fillSubjects(subjectList) {
                 url: subject.url,
                 onload: resp => {
                     let doc = DOM_PARSER.parseFromString(resp.responseText, "text/html");
-                    let trs = $(doc).find("tr:contains('講義室')~tr");
-                    trs = trs.length !== 0 ? trs : $(doc).find("tr:contains('Room')~tr");
+                    let trs = $(doc).find("tr:contains('講義室'):contains('備考')~tr");
+                    trs = trs.length !== 0 ? trs : $(doc).find("tr:contains('Room'):contains('Note')~tr");
                     for (let tr of trs) {
                         let schdule = new Schdule();
                         schdule.date = formatDate(tr.cells[1].innerHTML.toString().trim());
