@@ -12,6 +12,8 @@
 // ==/UserScript==
 
 'use strict';
+// whether dump the courses which were over cancellation time limit
+const DUMP_OUTDATE_FLAG = false
 // true for log viewing
 const MYLOG_FLAG = true;
 const DOM_PARSER = new DOMParser();
@@ -80,8 +82,10 @@ class Schdule {
     if (!confirm('Are you sure to dump your registered subjects to .ics file?'))
         return;
 
-    let subjectList = $.map($('table.tbl01.mB20 a[target=_blank]'), node =>
-        new Subject(node.text.trim(), node.href.trim()));
+    let subjectListSelector = DUMP_OUTDATE_FLAG ? 'table.tbl01.mB20 a[target=_blank]'
+        : 'table.tbl01.mB20 td:not(.bgGray01) a[target=_blank]';
+
+    let subjectList = $.map($(subjectListSelector), node => new Subject(node.text.trim(), node.href.trim())); 
 
     if (subjectList.length === 0) {
         alert('No subject found.');
