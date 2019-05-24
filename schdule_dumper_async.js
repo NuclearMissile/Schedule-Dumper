@@ -100,7 +100,7 @@ class Schdule {
 PRODID:-//Google Inc//Google Calendar 70.9054//EN
 VERSION:2.0
 X-WR-TIMEZONE:Asia/Tokyo
-${subjectList.flatMap(subject => subject.toEventStringList(subject)).join('\n')}
+${subjectList.flatMap(subject => subject.toEventStringList()).join('\n')}
 END:VCALENDAR`;
         downloadString(icsString, `dump_${moment().format('YYYYMMDDTHHmmss')}.ics`);
         console.mylog('*******END********');
