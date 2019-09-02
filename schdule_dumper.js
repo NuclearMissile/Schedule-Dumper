@@ -19,12 +19,12 @@ const MYLOG_FLAG = true;
 const DOM_PARSER = new DOMParser();
 const TARGET_URL = 'https://subjregist.naist.jp/registrations/preview_list';
 const TIME_TABLE = {
-    '1': { start: '092000', end: '105000' },
-    '2': { start: '110000', end: '123000' },
-    '3': { start: '133000', end: '150000' },
-    '4': { start: '151000', end: '164000' },
-    '5': { start: '165000', end: '182000' },
-    '6': { start: '183000', end: '200000' },
+    '1': {start: '092000', end: '105000'},
+    '2': {start: '110000', end: '123000'},
+    '3': {start: '133000', end: '150000'},
+    '4': {start: '151000', end: '164000'},
+    '5': {start: '165000', end: '182000'},
+    '6': {start: '183000', end: '200000'},
 };
 
 console.mylog = msg => {
@@ -41,7 +41,9 @@ class Subject {
         this.schduleList = [];
     }
 
-    toString() { return JSON.stringify(this, '\t'); }
+    toString() {
+        return JSON.stringify(this, '\t');
+    }
 
     toEventStringList() {
         return this.schduleList
@@ -70,7 +72,9 @@ class Schdule {
         this.end = null;
     }
 
-    toString() { return JSON.stringify(this, '\t'); }
+    toString() {
+        return JSON.stringify(this, '\t');
+    }
 }
 
 (function () {
@@ -79,17 +83,20 @@ class Schdule {
         return;
     }
 
-    if (!confirm('Are you sure to dump your registered subjects to .ics file?'))
-        return;
-
     let subjectListSelector = DUMP_OUTDATE_FLAG ? 'table.tbl01.mB20 a[target=_blank]'
         : 'table.tbl01.mB20 td:not(.bgGray01) a[target=_blank]';
 
-    let subjectList = $.map($(subjectListSelector), node => new Subject(node.text.trim(), node.href.trim())); 
+    let subjectList = $.map($(subjectListSelector), node => new Subject(node.text.trim(), node.href.trim()));
 
     if (subjectList.length === 0) {
         alert('No subject found.');
         return;
+    } else {
+        let msg = `Below ${subjectList.length} subject(s) are found. Dump?
+        ${subjectList.flatMap(subject => subject.subjectName).join('\n')}`;
+        if (!confirm(msg)) {
+            return;
+        }
     }
 
     fillSubjects(subjectList).then(subjectList => {
@@ -132,7 +139,7 @@ function fillSubjects(subjectList) {
                         schdule.end = `${schdule.date}T${TIME_TABLE[schdule.time].end}`;
                         schdule.number = tr.cells[0].innerHTML.toString().trim();
                         schdule.room = tr.cells[3].innerHTML.toString().trim();
-                        schdule.note = tr.cells[4].innerHTML.toString().trim() + '(This is a dumped schdule.)';
+                        schdule.note = tr.cells[4].innerHTML.toString().trim() + '(Dumped schedule)';
                         subject.schduleList.push(schdule);
                     }
                     res(subject);

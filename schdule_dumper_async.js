@@ -79,9 +79,6 @@ class Schdule {
         return;
     }
 
-    if (!confirm('Are you sure to dump your registered subjects to .ics file?'))
-        return;
-
     let subjectListSelector = DUMP_OUTDATE_FLAG ? 'table.tbl01.mB20 a[target=_blank]'
         : 'table.tbl01.mB20 td:not(.bgGray01) a[target=_blank]';
 
@@ -90,6 +87,12 @@ class Schdule {
     if (subjectList.length === 0) {
         alert('No subject found.');
         return;
+    } else {
+        let msg = `Below ${subjectList.length} subject(s) are found. Dump?
+        ${subjectList.flatMap(subject => subject.subjectName).join('\n')}`;
+        if (!confirm(msg)) {
+            return;
+        }
     }
 
     try {
@@ -133,7 +136,7 @@ async function fillSubjects(subjectList) {
                         schdule.end = `${schdule.date}T${TIME_TABLE[schdule.time].end}`;
                         schdule.number = tr.cells[0].innerHTML.toString().trim();
                         schdule.room = tr.cells[3].innerHTML.toString().trim();
-                        schdule.note = tr.cells[4].innerHTML.toString().trim() + '(This is a dumped schdule.)';
+                        schdule.note = tr.cells[4].innerHTML.toString().trim() + '(Dumped schedule.)';
                         subject.schduleList.push(schdule);
                     }
                     res(subject);
