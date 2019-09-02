@@ -1,5 +1,5 @@
 # Schdule-Dumper
-A tampermonkey script dumping your course schdule to .ics file.
+A tampermonkey script for dumping NAIST course schdule to .ics file.
 
 # How to use this script:
 
