@@ -92,12 +92,11 @@ class Schdule {
     if (subjectList.length === 0) {
         alert('No subject found.');
         return;
-    } else {
-        let msg = `Below ${subjectList.length} subject(s) are found. Dump?
-        ${subjectList.flatMap(subject => subject.subjectName).join('\n')}`;
-        if (!confirm(msg)) {
-            return;
-        }
+    }
+    let msg = `Below ${subjectList.length} subject(s) are found. Dump?
+    ${subjectList.flatMap(subject => subject.subjectName).join('\n    ')}`;
+    if (!confirm(msg)) {
+        return;
     }
 
     fillSubjects(subjectList).then(subjectList => {
