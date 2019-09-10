@@ -5,7 +5,7 @@
 // @author       @NuclearMissle
 // @include      https://subjregist.naist.jp/registrations/preview_list
 // @grant        GM.xmlHttpRequest
-// @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js
 // @run-at       context-menu
 // @connect      syllabus.naist.jp
@@ -13,7 +13,7 @@
 
 'use strict';
 // whether dump the courses which were over cancellation time limit
-const DUMP_OUTDATE_FLAG = false
+const DUMP_OUTDATE_FLAG = false;
 // true for log viewing
 const MYLOG_FLAG = true;
 const DOM_PARSER = new DOMParser();
@@ -77,7 +77,8 @@ class Schdule {
     }
 }
 
-(function () {
+// entry point
+(() => {
     if (window.location.href !== TARGET_URL) {
         alert(`Please run this script at ${TARGET_URL}`);
         return;

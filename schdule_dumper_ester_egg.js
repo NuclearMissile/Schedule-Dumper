@@ -1,4 +1,4 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name         Schdule Dumper
 // @version      0.1
 // @description  A tampermonkey script for dumping your course schdule to .ics file.
@@ -7,7 +7,7 @@
 // @grant        GM.xmlHttpRequest
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js
-// @run-at       context-menu
+// @require      https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.5.3/rxjs.umd.min.js
 // @connect      syllabus.naist.jp
 // ==/UserScript==
 
@@ -26,6 +26,12 @@ const TIME_TABLE = {
     '5': { start: '165000', end: '182000' },
     '6': { start: '183000', end: '200000' },
 };
+const MAGIC_CODE = [
+    "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown",
+    "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight",
+    "KeyB", "KeyA", "KeyB", "KeyA"
+];
+const INPUT_TIME_LIMIT = 2500;
 
 console.mylog = msg => {
     if (MYLOG_FLAG) {
@@ -41,7 +47,9 @@ class Subject {
         this.schduleList = [];
     }
 
-    toString() { return JSON.stringify(this, '\t'); }
+    toString() {
+        return JSON.stringify(this, '\t');
+    }
 
     toEventStringList() {
         return this.schduleList
@@ -70,11 +78,12 @@ class Schdule {
         this.end = null;
     }
 
-    toString() { return JSON.stringify(this, '\t'); }
+    toString() {
+        return JSON.stringify(this, '\t');
+    }
 }
 
-// entry point
-(async () => {
+function main() {
     if (window.location.href !== TARGET_URL) {
         alert(`Please run this script at ${TARGET_URL}`);
         return;
@@ -83,7 +92,7 @@ class Schdule {
     let subjectListSelector = DUMP_OUTDATE_FLAG ? 'table.tbl01.mB20 a[target=_blank]'
         : 'table.tbl01.mB20 td:not(.bgGray01) a[target=_blank]';
 
-    let subjectList = $.map($(subjectListSelector), node => new Subject(node.text.trim(), node.href.trim())); 
+    let subjectList = $.map($(subjectListSelector), node => new Subject(node.text.trim(), node.href.trim()));
 
     if (subjectList.length === 0) {
         alert('No subject found.');
@@ -96,8 +105,7 @@ class Schdule {
         }
     }
 
-    try {
-        await fillSubjects(subjectList);
+    fillSubjects(subjectList).then(subjectList => {
         console.mylog('******Generate iCal file******');
         console.mylog(subjectList);
         let icsString = `BEGIN:VCALENDAR
@@ -108,9 +116,22 @@ ${subjectList.flatMap(subject => subject.toEventStringList()).join('\n')}
 END:VCALENDAR`;
         downloadString(icsString, `dump_${moment().format('YYYYMMDDTHHmmss')}.ics`);
         console.mylog('*******END********');
-    } catch (err) {
-        alert(err);
-    }
+    }).catch(reason => {
+        alert(reason);
+    });
+}
+
+// entry point
+(() => {
+    // rxjs.Observable.fromEvent(document, 'keyup')
+    //     .map(e => e.code)
+    //     .bufferCount(12, 1)
+    //     .bufferTime(INPUT_TIME_LIMIT)
+    //     .subscribe(bufferedInputs => {
+    //         if (_.isEqual(bufferedInputs, MAGIC_CODE)) {
+    //             main();
+    //         }
+    //     });
 })();
 
 function formatDate(date) {
@@ -118,7 +139,7 @@ function formatDate(date) {
     return `${moment().year()}${date}`;
 }
 
-async function fillSubjects(subjectList) {
+function fillSubjects(subjectList) {
     console.mylog('******fill subjectLists******');
     let promises = $.map(subjectList, subject =>
         new Promise((res, rej) => {
@@ -137,7 +158,7 @@ async function fillSubjects(subjectList) {
                         schdule.end = `${schdule.date}T${TIME_TABLE[schdule.time].end}`;
                         schdule.number = tr.cells[0].innerHTML.toString().trim();
                         schdule.room = tr.cells[3].innerHTML.toString().trim();
-                        schdule.note = tr.cells[4].innerHTML.toString().trim() + '(Dumped schedule.)';
+                        schdule.note = tr.cells[4].innerHTML.toString().trim() + '(Dumped schedule)';
                         subject.schduleList.push(schdule);
                     }
                     res(subject);
