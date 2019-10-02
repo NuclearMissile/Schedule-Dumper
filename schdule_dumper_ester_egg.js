@@ -31,7 +31,7 @@ const MAGIC_CODE = [
     "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight",
     "KeyB", "KeyA",
 ].toString();
-const INPUT_TIME_LIMIT = 2500;
+const INPUT_TIME_LIMIT = 3000;
 
 console.mylog = msg => {
     if (MYLOG_FLAG) {
@@ -121,16 +121,17 @@ END:VCALENDAR`;
 }
 
 // entry point
-
 Rx.Observable.fromEvent(document, 'keyup')
     .map(e => [e.code, Date.now()])
     .bufferCount(10, 1)
     .subscribe(buffer => {
-        if (Date.now() - buffer[0][1] <= INPUT_TIME_LIMIT) {
-            if (buffer.map(i => i[0]).toString() === MAGIC_CODE) {
-                main();
-            }
-        } 
+        let delay = Date.now() - buffer[0][1];
+        let inputs = buffer.map(i => i[0]).toString();
+        if (delay <= INPUT_TIME_LIMIT && inputs === MAGIC_CODE) {
+            main();
+        } else if (inputs === MAGIC_CODE){
+            alert(`too slow ${delay} > ${INPUT_TIME_LIMIT}.`);
+        }
     });
 
 function formatDate(date) {
