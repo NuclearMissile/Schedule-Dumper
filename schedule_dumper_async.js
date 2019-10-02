@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
-// @name         Schdule Dumper
+// @name         Schedule Dumper
 // @version      0.1
-// @description  A tampermonkey script for dumping your course schdule to .ics file.
+// @description  A tampermonkey script for dumping your course schedule to .ics file.
 // @author       @NuclearMissle
 // @include      https://subjregist.naist.jp/registrations/preview_list
 // @grant        GM.xmlHttpRequest
@@ -19,12 +19,12 @@ const MYLOG_FLAG = true;
 const DOM_PARSER = new DOMParser();
 const TARGET_URL = 'https://subjregist.naist.jp/registrations/preview_list';
 const TIME_TABLE = {
-    '1': {start: '092000', end: '105000'},
-    '2': {start: '110000', end: '123000'},
-    '3': {start: '133000', end: '150000'},
-    '4': {start: '151000', end: '164000'},
-    '5': {start: '165000', end: '182000'},
-    '6': {start: '183000', end: '200000'},
+    '1': { start: '092000', end: '105000' },
+    '2': { start: '110000', end: '123000' },
+    '3': { start: '133000', end: '150000' },
+    '4': { start: '151000', end: '164000' },
+    '5': { start: '165000', end: '182000' },
+    '6': { start: '183000', end: '200000' },
 };
 
 console.mylog = msg => {
@@ -41,18 +41,16 @@ class Subject {
         this.schduleList = [];
     }
 
-    toString() {
-        return JSON.stringify(this, '\t');
-    }
+    toString() { return JSON.stringify(this, '\t'); }
 
     toEventStringList() {
         return this.schduleList
-            .filter(schdule => moment().isBefore(schdule.start))
-            .map(schdule => `BEGIN:VEVENT
-DTSTART:${schdule.start}
-DTEND:${schdule.end}
-DESCRIPTION:${schdule.note}
-LOCATION:${schdule.room}
+            .filter(schedule => moment().isBefore(schedule.start))
+            .map(schedule => `BEGIN:VEVENT
+DTSTART:${schedule.start}
+DTEND:${schedule.end}
+DESCRIPTION:${schedule.note}
+LOCATION:${schedule.room}
 SEQUENCE:0
 STATUS:CONFIRMED
 SUMMARY:${this.subjectName}
@@ -61,7 +59,7 @@ END:VEVENT`);
     }
 }
 
-class Schdule {
+class Schedule {
     constructor() {
         this.number = null;
         this.date = null;
@@ -72,13 +70,11 @@ class Schdule {
         this.end = null;
     }
 
-    toString() {
-        return JSON.stringify(this, '\t');
-    }
+    toString() { return JSON.stringify(this, '\t'); }
 }
 
 // entry point
-(() => {
+(async () => {
     if (window.location.href !== TARGET_URL) {
         alert(`Please run this script at ${TARGET_URL}`);
         return;
@@ -99,7 +95,8 @@ class Schdule {
         return;
     }
 
-    fillSubjects(subjectList).then(subjectList => {
+    try {
+        await fillSubjects(subjectList);
         console.mylog('******Generate iCal file******');
         console.mylog(subjectList);
         let icsString = `BEGIN:VCALENDAR
@@ -110,9 +107,9 @@ ${subjectList.flatMap(subject => subject.toEventStringList()).join('\n')}
 END:VCALENDAR`;
         downloadString(icsString, `dump_${moment().format('YYYYMMDDTHHmmss')}.ics`);
         console.mylog('*******END********');
-    }).catch(reason => {
-        alert(reason);
-    });
+    } catch (err) {
+        alert(err);
+    }
 })();
 
 function formatDate(date) {
@@ -120,7 +117,7 @@ function formatDate(date) {
     return `${moment().year()}${date}`;
 }
 
-function fillSubjects(subjectList) {
+async function fillSubjects(subjectList) {
     console.mylog('******fill subjectLists******');
     let promises = $.map(subjectList, subject =>
         new Promise((res, rej) => {
@@ -132,15 +129,15 @@ function fillSubjects(subjectList) {
                     let trs = $(doc).find("tr:contains('講義室'):contains('備考')~tr");
                     trs = trs.length !== 0 ? trs : $(doc).find("tr:contains('Room'):contains('Note')~tr");
                     for (let tr of trs) {
-                        let schdule = new Schdule();
-                        schdule.date = formatDate(tr.cells[1].innerHTML.toString().trim());
-                        schdule.time = tr.cells[2].innerHTML.toString().trim();
-                        schdule.start = `${schdule.date}T${TIME_TABLE[schdule.time].start}`;
-                        schdule.end = `${schdule.date}T${TIME_TABLE[schdule.time].end}`;
-                        schdule.number = tr.cells[0].innerHTML.toString().trim();
-                        schdule.room = tr.cells[3].innerHTML.toString().trim();
-                        schdule.note = tr.cells[4].innerHTML.toString().trim() + '(Dumped schedule)';
-                        subject.schduleList.push(schdule);
+                        let schedule = new Schedule();
+                        schedule.date = formatDate(tr.cells[1].innerHTML.toString().trim());
+                        schedule.time = tr.cells[2].innerHTML.toString().trim();
+                        schedule.start = `${schedule.date}T${TIME_TABLE[schedule.time].start}`;
+                        schedule.end = `${schedule.date}T${TIME_TABLE[schedule.time].end}`;
+                        schedule.number = tr.cells[0].innerHTML.toString().trim();
+                        schedule.room = tr.cells[3].innerHTML.toString().trim();
+                        schedule.note = tr.cells[4].innerHTML.toString().trim() + '(Dumped schedule.)';
+                        subject.schduleList.push(schedule);
                     }
                     res(subject);
                 },
