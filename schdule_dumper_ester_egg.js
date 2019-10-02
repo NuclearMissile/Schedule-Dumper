@@ -7,7 +7,7 @@
 // @grant        GM.xmlHttpRequest
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js
-// @require      https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.5.3/rxjs.umd.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/rxjs/5.5.12/Rx.js
 // @connect      syllabus.naist.jp
 // ==/UserScript==
 
@@ -29,8 +29,8 @@ const TIME_TABLE = {
 const MAGIC_CODE = [
     "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown",
     "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight",
-    "KeyB", "KeyA", "KeyB", "KeyA"
-];
+    "KeyB", "KeyA",
+].toString();
 const INPUT_TIME_LIMIT = 2500;
 
 console.mylog = msg => {
@@ -121,17 +121,17 @@ END:VCALENDAR`;
 }
 
 // entry point
-(() => {
-    // rxjs.Observable.fromEvent(document, 'keyup')
-    //     .map(e => e.code)
-    //     .bufferCount(12, 1)
-    //     .bufferTime(INPUT_TIME_LIMIT)
-    //     .subscribe(bufferedInputs => {
-    //         if (_.isEqual(bufferedInputs, MAGIC_CODE)) {
-    //             main();
-    //         }
-    //     });
-})();
+
+Rx.Observable.fromEvent(document, 'keyup')
+    .map(e => [e.code, Date.now()])
+    .bufferCount(10, 1)
+    .subscribe(buffer => {
+        if (Date.now() - buffer[0][1] <= INPUT_TIME_LIMIT) {
+            if (buffer.map(i => i[0]).toString() === MAGIC_CODE) {
+                main();
+            }
+        } 
+    });
 
 function formatDate(date) {
     date = date.split('/').map(s => s.length === 1 ? `0${s}` : s).join('');
