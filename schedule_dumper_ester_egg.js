@@ -130,7 +130,7 @@ Rx.Observable.fromEvent(document, 'keyup')
         if (delay <= INPUT_TIME_LIMIT && inputs === MAGIC_CODE) {
             main();
         } else if (inputs === MAGIC_CODE){
-            alert(`too slow ${delay} > ${INPUT_TIME_LIMIT}.`);
+            // alert(`too slow ${delay} > ${INPUT_TIME_LIMIT}.`);
         }
     });
 
