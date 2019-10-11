@@ -4,6 +4,8 @@
 // @description  A tampermonkey script for dumping your course schedule to .ics file.
 // @author       @NuclearMissle
 // @include      https://subjregist.naist.jp/registrations/preview_list
+// @include      https://syllabus.naist.jp/subjects/preview_detail/*
+// @include      https://syllabus.naist.jp/charges/preview_detail/*
 // @grant        GM.xmlHttpRequest
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js
