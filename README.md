@@ -1,5 +1,5 @@
 # Schedule-Dumper
-A tampermonkey script for dumping NAIST course schedule to .ics file.
+A tampermonkey script for dumping your course schedule to .ics file for NAIST students.
 
 # How to use this script:
 
