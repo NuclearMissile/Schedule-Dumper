@@ -3,7 +3,7 @@ A tampermonkey script for dumping your course schedule to .ics file for NAIST st
 
 # How to use this script:
 
-0. Install the [Tampermonkey extension](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en) (if you not) for Chrome (not tested on other browsers);
+0. Install the [Tampermonkey extension](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en) (if not) for Chrome (not tested on other browsers);
 1. Install and enable this script;
 2. Log in https://subjregist.naist.jp/registrations/preview_list as usual;
 3. Right click in the blank area of the page, then click Schedule Dumper in the context menu (Tampermonkey => Schedule Dumper). If you installed the schedule_dumper_ester_egg.js, please input ↑↑↓↓←→←→BABA on the keyboard within 3s to fire the dumper. 
